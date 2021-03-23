@@ -4,9 +4,7 @@ import copy
 
 class game:
 	""" 
-		It is expected that all AI will be the AI playing as P1 against a generated map as P2
-	"""
-	"""
+	It is expected that all AI will be the AI playing as P1 against a generated map as P2
 	Ships
 		0:Carrier:5
 		1:Battleship:4
@@ -91,7 +89,7 @@ class game:
 				print("|", end = ' ')
 				print()
 
-	def placeShip(self, playerID, shipID, startLoc, endLoc):
+	def placeShip(self, playerID, shipID, startLoc, endLoc, echo=True):
 		# Getting the playerID
 		playerID = self.getPlayerID(playerID)
 
@@ -113,20 +111,31 @@ class game:
 				if self.p1ShipMap[crd[0]][crd[1]] == self.emptySpace:
 					spaces += 1
 				else:
-					print("Cannot place at (" + str(crd[0]) + ", " + str(crd[1]) +  ") already ship there")
+					if echo:
+						print("Cannot place at (" + str(crd[0]) + ", " + str(crd[1]) +  ") already ship there")
 					return False
 			
 			# Checking that the requested spaces size matches the ship
 			if shipID == 0 and spaces != 5:
-				exit("Request spaces for Carrier does not meet length of 5")
+				if echo:
+					print("Request spaces for Carrier does not meet length of 5")
+				exit()
 			if shipID == 1 and spaces != 4:
-				exit("Request spaces for Battleship does not meet length of 4")
+				if echo:
+					print("Request spaces for Battleship does not meet length of 4")
+				exit()
 			if shipID == 2 and spaces != 3:
-				exit("Request spaces for Cruiser does not meet length of 3")
+				if echo:
+					print("Request spaces for Cruiser does not meet length of 3")
+				exit()
 			if shipID == 3 and spaces != 3:
-				exit("Request spaces for Submarine does not meet length of 3")
+				if echo:
+					print("Request spaces for Submarine does not meet length of 3")
+				exit()
 			if shipID == 4 and spaces != 2:
-				exit("Request spaces for Destroyer does not meet length of 2")			
+				if echo:
+					print("Request spaces for Destroyer does not meet length of 2")
+				exit()		
 
 			# Actually placing ship
 			for crd in crds:
@@ -148,20 +157,31 @@ class game:
 				if self.p2ShipMap[crd[0]][crd[1]] == self.emptySpace:
 					spaces += 1
 				else:
-					print("Cannot place at (" + str(crd[0]) + ", " + str(crd[1]) +  ") already ship there")
+					if echo:
+						print("Cannot place at (" + str(crd[0]) + ", " + str(crd[1]) +  ") already ship there")
 					return False
 			
 			# Checking that the requested spaces size matches the ship
 			if shipID == 0 and spaces != 5:
-				exit("Request spaces for Carrier does not meet length of 5")
+				if echo:
+					print("Request spaces for Carrier does not meet length of 5")
+				exit()
 			if shipID == 1 and spaces != 4:
-				exit("Request spaces for Battleship does not meet length of 4")
+				if echo:
+					print("Request spaces for Battleship does not meet length of 4")
+				exit()
 			if shipID == 2 and spaces != 3:
-				exit("Request spaces for Cruiser does not meet length of 3")
+				if echo:
+					print("Request spaces for Cruiser does not meet length of 3")
+				exit()
 			if shipID == 3 and spaces != 3:
-				exit("Request spaces for Submarine does not meet length of 3")
+				if echo:
+					print("Request spaces for Submarine does not meet length of 3")
+				exit()
 			if shipID == 4 and spaces != 2:
-				exit("Request spaces for Destroyer does not meet length of 2")			
+				if echo:
+					print("Request spaces for Destroyer does not meet length of 2")
+				exit()			
 
 			# Actually placing ship
 			for crd in crds:
@@ -176,7 +196,7 @@ class game:
 				if shipID == 4:
 					self.p2ShipMap[crd[0]][crd[1]] = self.destroyerSym
 
-	def fire(self, playerID, fireLoc):
+	def fire(self, playerID, fireLoc, echo=True):
 		# Getting the playerID
 		playerID = self.getPlayerID(playerID)
 		
@@ -202,19 +222,27 @@ class game:
 				# Updating map
 				self.p1ShotMap[fireLoc[0]][fireLoc[1]] = self.hitMark
 
-				print("Hit!")
+				if echo:
+					print("Hit!")
 
 				# Updating shots taken
 				self.p1ShotsTaken += 1	
+				
+				# Returning True for hit
+				return True
 			# Empty space
 			else:
 				# Updating map
 				self.p1ShotMap[fireLoc[0]][fireLoc[1]] = self.missMark
 	
-				print("Miss")
+				if echo:
+					print("Miss")
 
 				# Updating shots taken
 				self.p1ShotsTaken += 1	
+				
+				# Returning False for miss
+				return False
 		# Player2 firing at Player1
 		elif playerID == self.player2:
 			# If not empty => hit
@@ -234,19 +262,27 @@ class game:
 				# Updating map
 				self.p2ShotMap[fireLoc[0]][fireLoc[1]] = self.hitMark
 
-				print("Hit!")
+				if echo:
+					print("Hit!")
 
 				# Updating shots taken
 				self.p2ShotsTaken += 1	
+
+				# Returning True for hit
+				return True
 			# Empty space
 			else:
 				# Updating map
 				self.p2ShotMap[fireLoc[0]][fireLoc[1]] = self.missMark
 	
-				print("Miss")
+				if echo:
+					print("Miss")
 
 				# Updating shots taken
 				self.p2ShotsTaken += 1	
+
+				# Returning False for miss
+				return False
 
 	def clearBoard(self):
 		# Resetting maps
@@ -292,7 +328,7 @@ class game:
 			end = (start[0], start[1] + 4)
 		
 
-		self.placeShip("2", 0, start, end)
+		self.placeShip("2", 0, start, end, False)
 
 		
 		##################
@@ -311,7 +347,7 @@ class game:
 				start = (random.randint(0, 9), random.randint(0, 6))
 				end = (start[0], start[1] + 3)
 
-			ret = self.placeShip("2", 1, start, end)
+			ret = self.placeShip("2", 1, start, end, False)
 			if ret == False:
 				continue
 			battleshipPlaced = True		
@@ -333,7 +369,7 @@ class game:
 				end = (start[0], start[1] + 2)
 			
 		
-			ret = self.placeShip("2", 2, start, end)
+			ret = self.placeShip("2", 2, start, end, False)
 			if ret == False:
 				continue
 			cruiserPlaced = True		
@@ -354,7 +390,7 @@ class game:
 				start = (random.randint(0, 9), random.randint(0, 7))
 				end = (start[0], start[1] + 2)
 	
-			ret = self.placeShip("2", 3, start, end)
+			ret = self.placeShip("2", 3, start, end, False)
 			if ret == False:
 				continue
 			submarinePlaced = True		
@@ -375,44 +411,93 @@ class game:
 				start = (random.randint(0, 9), random.randint(0, 8))
 				end = (start[0], start[1] + 1)
 
-			ret = self.placeShip("2", 4, start, end)
+			ret = self.placeShip("2", 4, start, end, False)
 			if ret == False:
 				continue
 			destroyerPlaced = True		
 
 	def randomShot(self, numPlays):
 		shots = 0
+		best = 100
 		
 		possibleShots = [(0,0),(0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(0,7),(0,8),(0,9),(1,0),(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(2,0),(2,1),(2,2),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),(2,9),(3,0),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),(3,9),(4,0),(4,1),(4,2),(4,3),(4,4),(4,5),(4,6),(4,7),(4,8),(4,9),(5,0),(5,1),(5,2),(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(5,9),(6,0),(6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(7,0),(7,1),(7,2),(7,3),(7,4),(7,5),(7,6),(7,7),(7,8),(7,9),(8,0),(8,1),(8,2),(8,3),(8,4),(8,5),(8,6),(8,7),(8,8),(8,9),(9,0),(9,1),(9,2),(9,3),(9,4),(9,5),(9,6),(9,7),(9,8),(9,9)]
 
 		for x in range(numPlays):
+			if x % 10000 == 0:
+				print(x)
 			# Building the random map for this game
 			self.genRandomMap()
 
 			# Saving copy of possible shots
 			thisGameShots = copy.copy(possibleShots)
+			
+			# Single game shot count
+			singleGame = 0
 			# While Player1 has not won
 			while not self.checkWin("1"):
 				# Picking random shot
 				shotIndex = random.randint(0,len(thisGameShots) - 1)
 
 				# Firing at that location
-				self.fire("1", thisGameShots[shotIndex])
+				self.fire("1", thisGameShots[shotIndex], False)
 
 				# Removing that index from the possible shots
 				thisGameShots.pop(shotIndex)
 
 				# Incrementing shots
 				shots += 1
+				singleGame += 1
 
-				#self.printShot("1")
+
+			# If we are better than the current best game
+			if singleGame < best:
+				best = singleGame
+
 			# Game over, resetting board
 			self.clearBoard()
 
 
-		print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays)) 
+		print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays) + "\nBest game was " + str(best)) 
+
+	def heatMapMode(self, numPlays):
+		shots = 0
+		best = 100
+		
+		#heatMap = self.heatMap(self.getShotMap(self.player1))
+
+		for x in range(numPlays):
+			# Building the random map for this game
+			self.genRandomMap()
+
+			# Picking first shot
+			firstShot = (random.randint(0,9), random.randint(0,9))
+
+			# Making first shot
+			self.fire("1", firstShot, False)
+
+			heatMap = self.heatMap(self.getShotMap(self.player1))
+
+			# While Player1 has not won
+			#while not self.checkWin("1"):
+			#	heatMap = self.heatMap(self.getShotMap(self.player1))
+
+				# Firing at that location
+				#self.fire("1", thisGameShots[shotIndex], False)
+
+				# Removing that index from the possible shots
+				#thisGameShots.pop(shotIndex)
+
+				# Incrementing shots
+				#shots += 1
+			#	break
 
 
+
+				#self.printShot("1")
+			# Game over, resetting board
+			#self.clearBoard()
+
+		#print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays)) 
 
 	###################################################################################################################
 	# Utility Functions
@@ -505,7 +590,6 @@ class game:
 		if len(crd) != 2:
 			exit("A board coordinate must be two long. Example: (0,1) or (9,5)")
 		
-
 		# Getting the first value
 		try:
 			first = crd[0]
@@ -552,6 +636,49 @@ class game:
 				return False
 		else:
 			return False
+
+	def getShotMap(self, playerID):
+		playerID = self.getPlayerID(playerID)
+
+		if playerID == self.player1:
+			return self.p1ShotMap
+		elif playerID == self.player2:
+			return self.p2ShotMap
+		else:
+			return False	
+
+	def heatMap(self, shotMap):
+		heatMap = [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]]
+		
+		# Print shot map, remove later
+		#for row in shotMap:
+		#	for char in row:
+		#		print("|" + char, end = ' ')
+		#		
+		#	print("|", end = ' ')
+		#	print()
+
+		# Checking horizontal sections
+		for x in range(len(shotMap)):
+			for y in range(len(shotMap[x])):
+				start = (x,y)
+				
+				# Destroyer
+				if start[1] <= 8:
+					end = (x, y+1)
+				else:
+					continue
+				if shotMap[start[0]][start[1]] == " " and shotMap[end[0]][end[1]] == " ":
+					heatMap[start[0]][start[1]] += 1
+					heatMap[end[0]][end[1]] += 1
+
+		# Print heat map, remove later
+		for row in heatMap:
+			for char in row:
+				print("|" + str(char), end = ' ')
+				
+			print("|", end = ' ')
+			print()
 
 	
 

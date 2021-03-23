@@ -34,7 +34,11 @@ session.printShot("1")
 
 print(session.checkWin("1"))
 """
-session.randomShot(1000)
+session.genRandomMap()
+session.printShip("2")
+#session.randomShot(10000)
+#session.huntMode(10)
+#session.heatMapMode(1)
 
 #session.fire("1", (5,5))
 #session.printShot("1")
