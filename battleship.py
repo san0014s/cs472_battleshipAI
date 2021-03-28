@@ -459,46 +459,6 @@ class game:
 
 		print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays) + "\nBest game was " + str(best)) 
 
-	def heatMapMode(self, numPlays):
-		shots = 0
-		best = 100
-		
-		#heatMap = self.heatMap(self.getShotMap(self.player1))
-
-		for x in range(numPlays):
-			# Building the random map for this game
-			self.genRandomMap()
-
-			# Picking first shot
-			firstShot = (random.randint(0,9), random.randint(0,9))
-
-			# Making first shot
-			self.fire("1", firstShot, False)
-
-			heatMap = self.heatMap(self.getShotMap(self.player1))
-
-			# While Player1 has not won
-			#while not self.checkWin("1"):
-			#	heatMap = self.heatMap(self.getShotMap(self.player1))
-
-				# Firing at that location
-				#self.fire("1", thisGameShots[shotIndex], False)
-
-				# Removing that index from the possible shots
-				#thisGameShots.pop(shotIndex)
-
-				# Incrementing shots
-				#shots += 1
-			#	break
-
-
-
-				#self.printShot("1")
-			# Game over, resetting board
-			#self.clearBoard()
-
-		#print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays)) 
-
 	###################################################################################################################
 	# Utility Functions
 	###################################################################################################################
