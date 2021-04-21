@@ -1,6 +1,7 @@
-import math
+import math 
 import random
 import copy
+from termcolor import colored
 
 class game:
 	""" 
@@ -32,6 +33,12 @@ class game:
 		self.p2CruiserHealth = 3
 		self.p2SubmarineHealth = 3
 		self.p2DestroyerHealth = 2
+
+		self.p2CarrierSunk = False
+		self.p2BattleshipSunk = False
+		self.p2CruiserSunk = False
+		self.p2SubmarineSunk= False
+		self.p2DestroyerSunk = False
 
 		# Analytics values 
 		self.p1ShotsTaken = 0
@@ -78,7 +85,7 @@ class game:
 		if playerID == self.player1:
 			for row in self.p1ShotMap:
 				for char in row:
-					print("|" + char, end = ' ')
+					print("|" + char.ljust(2), end = ' ')
 					
 				print("|", end = ' ')
 				print()
@@ -210,14 +217,29 @@ class game:
 				# Decremeting health of enemy ship
 				if self.p2ShipMap[fireLoc[0]][fireLoc[1]] == self.carrierSym:
 					self.p2CarrierHealth -= 1
+					if self.p2CarrierHealth == 0 and echo:
+						print("Carrier Sunk")
+						self.p2CarrierSunk = True
 				if self.p2ShipMap[fireLoc[0]][fireLoc[1]] == self.battleshipSym:
 					self.p2BattleshipHealth -= 1
+					if self.p2BattleshipHealth == 0 and echo:
+						print("Battleship Sunk")
+						self.p2BattleshipSunk = True
 				if self.p2ShipMap[fireLoc[0]][fireLoc[1]] == self.cruiserSym:
 					self.p2CruiserHealth -= 1
+					if self.p2CruiserHealth == 0 and echo:
+						print("Cruiser Sunk")
+						self.p2CruiserSunk = True
 				if self.p2ShipMap[fireLoc[0]][fireLoc[1]] == self.submarineSym:
 					self.p2SubmarineHealth -= 1
+					if self.p2SubmarineHealth == 0 and echo:
+						print("Submarine Sunk")
+						self.p2SubmarineSunk= True
 				if self.p2ShipMap[fireLoc[0]][fireLoc[1]] == self.destroyerSym:
 					self.p2DestroyerHealth -= 1
+					if self.p2DestroyerHealth == 0 and echo:
+						print("Destroyer Sunk")
+						self.p2DestroyerSunk = True
 
 				# Updating map
 				self.p1ShotMap[fireLoc[0]][fireLoc[1]] = self.hitMark
@@ -466,38 +488,79 @@ class game:
 		#heatMap = self.heatMap(self.getShotMap(self.player1))
 
 		for x in range(numPlays):
+			print("Playing game " + str(x))
+			print("================================================================================================================")
 			# Building the random map for this game
 			self.genRandomMap()
 
 			# Picking first shot
 			firstShot = (random.randint(0,9), random.randint(0,9))
+			prevShot = firstShot
 
 			# Making first shot
 			self.fire("1", firstShot, False)
 
-			heatMap = self.heatMap(self.getShotMap(self.player1))
-
 			# While Player1 has not won
-			#while not self.checkWin("1"):
-			#	heatMap = self.heatMap(self.getShotMap(self.player1))
+			while not self.checkWin("1"):
+				# Getting the current heat map
+				heatMap = self.heatMap(self.getShotMap(self.player1), prevShot)
+				
+				bestShotVal = -1
+				bestShotLoc = (0,0)
+				# Finding the next best position
+				for x in range(len(heatMap)):
+					for y in range(len(heatMap[x])):
+						if heatMap[x][y] > bestShotVal and self.p1ShotMap[x][y] == " ":
+							bestShotLoc = (x,y)
+							bestShotVal = heatMap[x][y]
+				
+				
+				# Combining both, remove later
+				combinedMaps = []
+				for x in range(len(heatMap)):
+					singleRow = []
+					for y in range(len(heatMap[x])):
+						# Shot map first
+						singleRow.insert(y, self.p1ShotMap[x][y])
+						# Heat map second
+						singleRow.insert(y+10, heatMap[x][y])
+					combinedMaps.append(singleRow)
+
+				# Printing both maps
+				for x in range(len(combinedMaps)):
+					for y in range(len(combinedMaps[x])):
+						if y < 10:
+							#print(x,y)
+							print("|" + str(combinedMaps[x][y]).center(3, " "), end = ' ')
+							
+
+							#print("|", end = ' ')
+						if y == 10:
+							print("|\t\t", end = ' ')
+						if y >= 10:
+							print("|" + str(combinedMaps[x][y]).center(3, " "), end = ' ')
+							#print("|", end = ' ')
+					print()
+				print("================================================================================================================")
+				
+	
+
+
+
 
 				# Firing at that location
-				#self.fire("1", thisGameShots[shotIndex], False)
+				self.fire("1", bestShotLoc, False)
 
-				# Removing that index from the possible shots
-				#thisGameShots.pop(shotIndex)
+				# Updating prevShot
+				prevShot = bestShotLoc
 
 				# Incrementing shots
-				#shots += 1
-			#	break
+				shots += 1
 
-
-
-				#self.printShot("1")
 			# Game over, resetting board
-			#self.clearBoard()
+			self.clearBoard()
 
-		#print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays)) 
+		print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays)) 
 
 	###################################################################################################################
 	# Utility Functions
@@ -625,12 +688,12 @@ class game:
 		playerID = self.getPlayerID(playerID)
 
 		if playerID == self.player1:
-			if self.p2CarrierHealth == 0 and self.p2BattleshipHealth == 0 and self.p2CruiserHealth == 0 and self.p2SubmarineHealth == 0 and self.p2DestroyerHealth == 0:
+			if self.p2CarrierHealth <= 0 and self.p2BattleshipHealth <= 0 and self.p2CruiserHealth <= 0 and self.p2SubmarineHealth <= 0 and self.p2DestroyerHealth <= 0:
 				return True
 			else:
 				return False 
 		elif playerID == self.player2:
-			if self.p1CarrierHealth == 0 and self.p1BattleshipHealth == 0 and self.p1CruiserHealth == 0 and self.p1SubmarineHealth == 0 and self.p1DestroyerHealth == 0:
+			if self.p1CarrierHealth <= 0 and self.p1BattleshipHealth <= 0 and self.p1CruiserHealth <= 0 and self.p1SubmarineHealth <= 0 and self.p1DestroyerHealth <= 0:
 				return True
 			else:
 				return False
@@ -647,38 +710,461 @@ class game:
 		else:
 			return False	
 
-	def heatMap(self, shotMap):
+	def heatMapOld(self, shotMap):
 		heatMap = [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]]
-		
-		# Print shot map, remove later
-		#for row in shotMap:
-		#	for char in row:
-		#		print("|" + char, end = ' ')
-		#		
-		#	print("|", end = ' ')
-		#	print()
 
-		# Checking horizontal sections
+		# For every starting position
 		for x in range(len(shotMap)):
 			for y in range(len(shotMap[x])):
 				start = (x,y)
 				
-				# Destroyer
+				####################################
+				# Horizontal Destroyer
+				####################################
 				if start[1] <= 8:
 					end = (x, y+1)
-				else:
-					continue
-				if shotMap[start[0]][start[1]] == " " and shotMap[end[0]][end[1]] == " ":
-					heatMap[start[0]][start[1]] += 1
-					heatMap[end[0]][end[1]] += 1
+					if shotMap[start[0]][start[1]] == " " and shotMap[end[0]][end[1]] == " " and self.p2DestroyerSunk == False:
+						heatMap[start[0]][start[1]] += 1
+						heatMap[end[0]][end[1]] += 1
 
-		# Print heat map, remove later
-		for row in heatMap:
-			for char in row:
-				print("|" + str(char), end = ' ')
+				####################################
+				# Vertical Destroyer
+				####################################
+				if start[0] <= 8:
+					end = (x + 1, y)
 				
-			print("|", end = ' ')
-			print()
+					if shotMap[start[0]][start[1]] == " " and shotMap[end[0]][end[1]] == " " and self.p2DestroyerSunk == False:
+						heatMap[start[0]][start[1]] += 1
+						heatMap[end[0]][end[1]] += 1
+
+				####################################
+				# Horizontal Submarine
+				####################################
+				if start[1] <= 7:
+					end = (x, y+2)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if shotMap[crd[0]][crd[1]] != " " and good == True and self.p2SubmarineSunk == False:
+							good = False # Break out of for loop if not good
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Submarine
+				####################################
+				if start[0] <= 7:
+					end = (x + 2, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if shotMap[crd[0]][crd[1]] != " " and good == True and self.p2SubmarineSunk == False:
+							good = False # Break out of for loop if not good
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Horizontal Cruiser
+				####################################
+				if start[1] <= 7:
+					end = (x, y+2)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if shotMap[crd[0]][crd[1]] != " " and good == True and self.p2CruiserSunk == False:
+							good = False # Break out of for loop if not good
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Cruiser
+				####################################
+				if start[0] <= 7:
+					end = (x + 2, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if shotMap[crd[0]][crd[1]] != " " and good == True and self.p2CruiserSunk == False:
+							good = False # Break out of for loop if not good
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Horizontal Battleship
+				####################################
+				if start[1] <= 6:
+					end = (x, y+3)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if shotMap[crd[0]][crd[1]] != " " and good == True and self.p2BattleshipSunk == False:
+							good = False # Break out of for loop if not good
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Battleship
+				####################################
+				if start[0] <= 6:
+					end = (x + 3, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if shotMap[crd[0]][crd[1]] != " " and good == True and self.p2BattleshipSunk == False:
+							good = False # Break out of for loop if not good
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Horizontal Carrier
+				####################################
+				if start[1] <= 5:
+					end = (x, y+4)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if shotMap[crd[0]][crd[1]] != " " and good == True and self.p2CarrierSunk == False:
+							good = False # Break out of for loop if not good
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Carrier
+				####################################
+				if start[0] <= 5:
+					end = (x + 4, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if shotMap[crd[0]][crd[1]] != " " and good == True and self.p2CarrierSunk == False:
+							good = False # Break out of for loop if not good
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+		""" Old version where I was having a circling effect that was causing too long of games
+		for x in range(len(shotMap)):
+			for y in range(len(shotMap)):
+				if shotMap[x][y] != self.emptySpace and shotMap[x][y] == self.hitMark:
+					
+					crds = []
+					
+					# Cannot go down
+					if x > 8:
+						# Can go left right and up
+						left = (x, y - 1) 
+						right = (x, y + 1)
+						up = (x - 1, y)
+
+						crds.append(left)
+						crds.append(right)
+						crds.append(up)
+					else:
+						downCrd = (x + 1, y)
+						crds.append(downCrd)
+					
+					# Cannot go up
+					if x < 1:
+						# Can go left, right, down
+						left = (x, y - 1)
+						right = (x, y + 1)
+						down = (x + 1 , y)
+
+						crds.append(left)
+						crds.append(right)
+						crds.append(down)
+					else:
+						upCrd = (x - 1, y)
+						crds.append(upCrd)
+					
+					# Cannot go left
+					if y < 1:
+						# Can go right, up, down
+						right = (x, y + 1)
+						up = (x - 1, y)
+						down = (x + 1 , y)
+
+						crds.append(right)
+						crds.append(up)
+						crds.append(down)						
+						continue
+					else:
+						leftCrd = (x, y - 1)
+						crds.append(leftCrd)
+					
+					# Cannot go right
+					if y > 8:
+						# Can go left, up, down
+						left = (x, y - 1)
+						up = (x - 1, y)
+						down = (x + 1 , y)
+
+						crds.append(left)
+						crds.append(up)
+						crds.append(down)	
+					else:
+						rightCrd = (x, y + 1)
+						
+						crds.append(rightCrd)
+
+					for crd in crds:
+						if crd[0] >= 10 or crd[1] >= 10:
+							continue
+						if shotMap[crd[0]][crd[1]] == self.emptySpace:
+							heatMap[crd[0]][crd[1]] = heatMap[crd[0]][crd[1]] * 10
+			"""
+
+		return heatMap
+
+	def heatMap(self, shotMap, shot):
+		heatMap = [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]]
+
+		# For every starting position
+		for x in range(len(shotMap)):
+			for y in range(len(shotMap[x])):
+				start = (x,y)
+				
+				####################################
+				# Horizontal Destroyer
+				####################################
+				if start[1] <= 8:
+					end = (x, y+1)
+					if shotMap[start[0]][start[1]] == " " and shotMap[end[0]][end[1]] == " " and self.p2DestroyerSunk == False:
+						heatMap[start[0]][start[1]] += 1
+						heatMap[end[0]][end[1]] += 1
+
+				####################################
+				# Vertical Destroyer
+				####################################
+				if start[0] <= 8:
+					end = (x + 1, y)
+				
+					if shotMap[start[0]][start[1]] == " " and shotMap[end[0]][end[1]] == " " and self.p2DestroyerSunk == False:
+						heatMap[start[0]][start[1]] += 1
+						heatMap[end[0]][end[1]] += 1
+
+				####################################
+				# Horizontal Submarine
+				####################################
+				if start[1] <= 7:
+					end = (x, y+2)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2SubmarineSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Submarine
+				####################################
+				if start[0] <= 7:
+					end = (x + 2, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2SubmarineSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Horizontal Cruiser
+				####################################
+				if start[1] <= 7:
+					end = (x, y+2)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2CruiserSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Cruiser
+				####################################
+				if start[0] <= 7:
+					end = (x + 2, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2CruiserSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False 
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Horizontal Battleship
+				####################################
+				if start[1] <= 6:
+					end = (x, y+3)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2BattleshipSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False 
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Battleship
+				####################################
+				if start[0] <= 6:
+					end = (x + 3, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2BattleshipSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+				
+				####################################
+				# Horizontal Carrier
+				####################################
+				if start[1] <= 5:
+					end = (x, y+4)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2CarrierSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+		
+				####################################
+				# Vertical Carrier
+				####################################
+				if start[0] <= 5:
+					end = (x + 4, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2CarrierSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+		""" Old version where I was having a circling effect that was causing too long of games"""
+		for x in range(len(shotMap)):
+			for y in range(len(shotMap)):
+				if shotMap[x][y] != self.emptySpace and shotMap[x][y] == self.hitMark:
+					
+					crds = []
+					
+					# Cannot go down
+					if x > 8:
+						# Can go left right and up
+						left = (x, y - 1) 
+						right = (x, y + 1)
+						up = (x - 1, y)
+
+						crds.append(left)
+						crds.append(right)
+						crds.append(up)
+					else:
+						downCrd = (x + 1, y)
+						crds.append(downCrd)
+					
+					# Cannot go up
+					if x < 1:
+						# Can go left, right, down
+						left = (x, y - 1)
+						right = (x, y + 1)
+						down = (x + 1 , y)
+
+						crds.append(left)
+						crds.append(right)
+						crds.append(down)
+					else:
+						upCrd = (x - 1, y)
+						crds.append(upCrd)
+					
+					# Cannot go left
+					if y < 1:
+						# Can go right, up, down
+						right = (x, y + 1)
+						up = (x - 1, y)
+						down = (x + 1 , y)
+
+						crds.append(right)
+						crds.append(up)
+						crds.append(down)						
+						continue
+					else:
+						leftCrd = (x, y - 1)
+						crds.append(leftCrd)
+					
+					# Cannot go right
+					if y > 8:
+						# Can go left, up, down
+						left = (x, y - 1)
+						up = (x - 1, y)
+						down = (x + 1 , y)
+
+						crds.append(left)
+						crds.append(up)
+						crds.append(down)	
+					else:
+						rightCrd = (x, y + 1)
+						
+						crds.append(rightCrd)
+
+					for crd in crds:
+						if crd[0] >= 10 or crd[1] >= 10:
+							continue
+						if shotMap[crd[0]][crd[1]] == self.emptySpace:
+							heatMap[crd[0]][crd[1]] = heatMap[crd[0]][crd[1]] * 10
+
+		return heatMap
+		
+
 
 	
 
