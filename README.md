@@ -14,35 +14,32 @@ class index of ship : common name of ship : ship length
 
 ## Class variables
 Below is a list of all class variables that are used and modified throughout execution. 
-self.p1ShipMap: Player 1's ship map
-self.p2ShipMap: Player 2's ship map
-self.p1ShotMap: Player 1's shot map
-self.p2ShotMap: Player 2's shot map
 
-self.p1CarrierHealth = 5 	: Player 1 Carrier Health, initialized at 5 at beginning of game 
+	self.p1ShipMap: Player 1's ship map
+	self.p2ShipMap: Player 2's ship map
+	self.p1ShotMap: Player 1's shot map
+	self.p2ShotMap: Player 2's shot map
 
-self.p1BattleshipHealth = 4 : Player 1 Battleship Health, initialized at 4 at beginning of game 
+	self.p1CarrierHealth = 5 	: Player 1 Carrier Health, initialized at 5 at beginning of game 
+	self.p1BattleshipHealth = 4 : Player 1 Battleship Health, initialized at 4 at beginning of game 
+	self.p1CruiserHealth = 3	: Player 1 Cruiser Health, initialized at 3 at beginning of game 
+	self.p1SubmarineHealth = 3	: Player 1 Submarine Health, initialized at 3 at beginning of game 
+	self.p1DestroyerHealth = 2	: Player 1 Destroyer Health, initialized at 2 at beginning of game 
 
-self.p1CruiserHealth = 3	: Player 1 Cruiser Health, initialized at 3 at beginning of game 
+	self.p2CarrierHealth = 5	: Player 2 Carrier Health, initialized at 5 at beginning of game 
+	self.p2BattleshipHealth = 4 : Player 2 Battleship Health, initialized at 4 at beginning of game 
+	self.p2CruiserHealth = 3	: Player 2 Cruiser Health, initialized at 3 at beginning of game 
+	self.p2SubmarineHealth = 3	: Player 2 Submarine Health, initialized at 3 at beginning of game 
+	self.p2DestroyerHealth = 2	: Player 2 Destroyer Health, initialized at 2 at beginning of game 
 
-self.p1SubmarineHealth = 3	: Player 1 Submarine Health, initialized at 3 at beginning of game 
-
-self.p1DestroyerHealth = 2	: Player 1 Destroyer Health, initialized at 2 at beginning of game 
-
-self.p2CarrierHealth = 5	: Player 2 Carrier Health, initialized at 5 at beginning of game 
-self.p2BattleshipHealth = 4 : Player 2 Battleship Health, initialized at 4 at beginning of game 
-self.p2CruiserHealth = 3	: Player 2 Cruiser Health, initialized at 3 at beginning of game 
-self.p2SubmarineHealth = 3	: Player 2 Submarine Health, initialized at 3 at beginning of game 
-self.p2DestroyerHealth = 2	: Player 2 Destroyer Health, initialized at 2 at beginning of game 
-
-self.carrierSym = "A"	: Carrier symbol
-self.battleshipSym = "B": Battleship symbol
-self.cruiserSym = "C"	: Cruiser sumbol
-self.submarineSym = "S"	: Submarine symbol
-self.destroyerSym = "D"	: Destroyer symbol
-self.hitMark = "!"		: Hit mark symbol
-self.missMark = "X"		: Miss mark symbol
-self.emptySpace = " "	: Empty space symbol
+	self.carrierSym = "A"	: Carrier symbol
+	self.battleshipSym = "B": Battleship symbol
+	self.cruiserSym = "C"	: Cruiser sumbol
+	self.submarineSym = "S"	: Submarine symbol
+	self.destroyerSym = "D"	: Destroyer symbol
+	self.hitMark = "!"		: Hit mark symbol
+	self.missMark = "X"		: Miss mark symbol
+	self.emptySpace = " "	: Empty space symbol
 
 ## Core game function pseudo code
 ### Place Ship
