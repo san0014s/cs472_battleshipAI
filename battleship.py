@@ -481,7 +481,6 @@ class game:
 
 		print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays) + "\nBest game was " + str(best)) 
 
-
 	def heatMapMode(self, numPlays):
 		shots = 0
 		best = 100
@@ -562,8 +561,459 @@ class game:
 			self.clearBoard()
 
 		print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays)) 
+
+	# Broken does not work
+	"""
+	def huntAndSeek(self):
+		#Hunt and Seek approach, hunt (random shot until a hit) until ship is found and seek out the rest of the ship
+		shots = 0
+
+		possibleShots = [(0,0),(0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(0,7),(0,8),(0,9),(1,0),(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(2,0),(2,1),(2,2),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),(2,9),(3,0),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),(3,9),(4,0),(4,1),(4,2),(4,3),(4,4),(4,5),(4,6),(4,7),(4,8),(4,9),(5,0),(5,1),(5,2),(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(5,9),(6,0),(6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(7,0),(7,1),(7,2),(7,3),(7,4),(7,5),(7,6),(7,7),(7,8),(7,9),(8,0),(8,1),(8,2),(8,3),(8,4),(8,5),(8,6),(8,7),(8,8),(8,9),(9,0),(9,1),(9,2),(9,3),(9,4),(9,5),(9,6),(9,7),(9,8),(9,9)]
+		thisGameShots = copy.copy(possibleShots)
+
+		hunting = True
+		seeking = False
+
+		self.genRandomMap()
+
+		#Random first shot
+		firstShot = random.randint(0,len(thisGameShots) - 1)
+		prevShot = firstShot
+		self.fire("1", thisGameShots[firstShot], False)
+		thisGameShots.pop(firstShot)
+		shots +=1
+
+		tuple = getTup(firstShot)
+
+		while not self.checkWin("1"):
+			if previous shot was a hit:
+				seeking = True
+				hunting = False
+				#seek
+				#spot to the right hasnt been shot at and is an empty space still
+				if self.p1ShotMap[tuple[0]][tuple[1]+1] == " ":  
+					shotRight = tuple
+					shotRight[1] = shotRight[1]+1
+					self.fire("1", thisGameShots[shotRight], False)
+					thisGameShots.pop(shotRight)
+					prevShot = shotRight
+					shots +=1
+		        #spot down hasnt been shot at and is an empty space still
+				else if self.p1ShotMap[tuple[0]+1][tuple[1]] == " ":     
+					shotDown = tuple
+					shotDown[0] = shotDown[0]+1
+					self.fire("1", thisGameShots[shotDown], False)
+					thisGameShots.pop(shotDown)
+					prevShot = shotDown
+					shots +=1
+		        #spot to the left hasnt been shot at and is an empty space still
+				else if self.p1ShotMap[tuple[0]][tuple[1]-1] == " ":      
+					shotLeft = tuple
+					shotLeft[1] = shotLeft[1]+1
+					self.fire("1", thisGameShots[shotLeft], False)
+					thisGameShots.pop(shotLeft)
+					prevShot = shotLeft
+					shots +=1
+		        #spot above hasnt been shot at and is an empty space still
+				else if self.p1ShotMap[tuple[0]-1][tuple[1]] == " ":      
+					shotUp = tuple
+					shotUp[0] = shotUp[0]-1
+					self.fire("1", thisGameShots[shotUp], False)
+					thisGameShots.pop(shotUp)
+					prevShot = shotUp
+					shots +=1
+		    else:
+				#hunt
+				seeking = False
+				hunting = True
+				newShot = random.randint(0,len(thisGameShots) - 1)
+				self.fire("1", thisGameShots[newShot], False)
+				thisGameShots.pop(newShot)
+				prevShot = newShot
+				shots +=1
+
+		print(str(shots) + " taken to win.")
+	"""
+
+	###################################################################################################################
+	# Utility Functions
+	###################################################################################################################
+	# Gets the playersID
+	def getPlayerID(self, playerID):
+		# If int, cast to string
+		if isinstance(playerID, int):
+			playerID = str(playerID)
 		
+		if len(playerID) != 1:
+			exit("Illegal playerID. Valid options are 1, 2, \"1\", or \"2\"")
+
+		if playerID != "1" and playerID != "2":
+			exit("Illegal playerID. Valid options are 1, 2, \"1\", or \"2\"")
+
+		return playerID
+
+	# Ensures that we are always going down and to the right
+	def swap(self, crd1, crd2):
+		# Horizontal
+		if crd1[0] == crd2[0]:
+			pass
+		# Vertical
+		elif crd1[1] == crd2[1]:
+			pass
+		# Slant
+		else:
+			exit("Slanted ships not allowed")
+
+		crd1Tot = crd1[0] + crd1[1]
+		crd2Tot = crd2[0] + crd2[1]
 
 
-	
+		if crd1Tot > crd2Tot:
+			temp = crd1
+			crd1 = crd2
+			crd2 = temp
 
+		return(crd1, crd2) 
+
+	# Given two coords, in down and to the right fasion, build list of all tuples in between
+	def getCrds(self, startLoc, endLoc):
+		if int(startLoc[1]) > 9 or int(startLoc[1]) < 0 or int(endLoc[1]) > 9 or int(endLoc[1]) < 0:
+			exit("Requested coords are above the limit of 9")
+		if int(startLoc[0]) > 9 or int(startLoc[0]) < 0 or int(endLoc[0]) > 9 or int(endLoc[0]) < 0:
+			exit("Requested coords are above the limit of 9")	
+		
+		ret = []
+		# Horizontal
+		if startLoc[0] == endLoc[0]:
+			# Appending first coordinate to list
+			ret.append(startLoc)
+			
+			# Temp var to hold the incrementing coordinate
+			temp = startLoc[1] + 1
+			while temp < endLoc[1]:
+				# Creating new coordinate
+				new = (startLoc[0], temp)
+				# Appening
+				ret.append(new)
+				# Iterating
+				temp += 1
+
+			# Appening last coordinate
+			ret.append(endLoc)
+		# Vertical
+		elif startLoc[1] == endLoc[1]:
+			# Appending first coordinate to list
+			ret.append(startLoc)
+			
+			# Temp var to hold the incrementing coordinate
+			temp = startLoc[0] + 1
+			while temp < endLoc[0]:
+				# Creating new coordinate
+				new = (temp, startLoc[1])
+				# Appening
+				ret.append(new)
+				# Iterating
+				temp += 1
+
+			# Appening last coordinate
+			ret.append(endLoc)
+		return ret
+
+	# Confirm that they are valid positions on the board
+	# Return the position as a tuple
+	def getTup(self, crd):
+		# Len has to be 2
+		if len(crd) != 2:
+			exit("A board coordinate must be two long. Example: (0,1) or (9,5)")
+		
+		# Getting the first value
+		try:
+			first = crd[0]
+			
+			if not isinstance(first, int):
+				exit("Must use 0-9 for coordinate system")
+
+			# If out of bounds for board
+			if first < 0 or first > 9:
+				exit("Map position " + str(crd[0]) + " out of bounds. Must be 0-9")
+		except Exception as e:
+			exit("getTup of first index failed")
+
+		# Getting the num value
+		try:
+			num = crd[1]
+		
+			if not isinstance(first, int):
+				exit("Must use 0-9 for coordinate system")
+		
+			# If out of bounds for board
+			if num < 0 or num > 9:
+				exit("Map position " + str(crd[1]) + " out of bound. Must be 0-9")
+
+		except Exception as e:
+			print(e)
+			exit("getTup of second index failed")
+
+		# Returning as tuple
+		return (first, num)
+
+	def checkWin(self, playerID):
+		playerID = self.getPlayerID(playerID)
+
+		if playerID == self.player1:
+			if self.p2CarrierHealth <= 0 and self.p2BattleshipHealth <= 0 and self.p2CruiserHealth <= 0 and self.p2SubmarineHealth <= 0 and self.p2DestroyerHealth <= 0:
+				return True
+			else:
+				return False 
+		elif playerID == self.player2:
+			if self.p1CarrierHealth <= 0 and self.p1BattleshipHealth <= 0 and self.p1CruiserHealth <= 0 and self.p1SubmarineHealth <= 0 and self.p1DestroyerHealth <= 0:
+				return True
+			else:
+				return False
+		else:
+			return False
+
+	def getShotMap(self, playerID):
+		playerID = self.getPlayerID(playerID)
+
+		if playerID == self.player1:
+			return self.p1ShotMap
+		elif playerID == self.player2:
+			return self.p2ShotMap
+		else:
+			return False	
+
+	def heatMap(self, shotMap, shot):
+		heatMap = [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]]
+
+		# For every starting position
+		for x in range(len(shotMap)):
+			for y in range(len(shotMap[x])):
+				start = (x,y)
+				
+				####################################
+				# Horizontal Destroyer
+				####################################
+				if start[1] <= 8:
+					end = (x, y+1)
+					if shotMap[start[0]][start[1]] == " " and shotMap[end[0]][end[1]] == " " and self.p2DestroyerSunk == False:
+						heatMap[start[0]][start[1]] += 1
+						heatMap[end[0]][end[1]] += 1
+
+				####################################
+				# Vertical Destroyer
+				####################################
+				if start[0] <= 8:
+					end = (x + 1, y)
+				
+					if shotMap[start[0]][start[1]] == " " and shotMap[end[0]][end[1]] == " " and self.p2DestroyerSunk == False:
+						heatMap[start[0]][start[1]] += 1
+						heatMap[end[0]][end[1]] += 1
+
+				####################################
+				# Horizontal Submarine
+				####################################
+				if start[1] <= 7:
+					end = (x, y+2)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2SubmarineSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Submarine
+				####################################
+				if start[0] <= 7:
+					end = (x + 2, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2SubmarineSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Horizontal Cruiser
+				####################################
+				if start[1] <= 7:
+					end = (x, y+2)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2CruiserSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Cruiser
+				####################################
+				if start[0] <= 7:
+					end = (x + 2, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2CruiserSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False 
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Horizontal Battleship
+				####################################
+				if start[1] <= 6:
+					end = (x, y+3)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2BattleshipSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False 
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+
+				####################################
+				# Vertical Battleship
+				####################################
+				if start[0] <= 6:
+					end = (x + 3, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2BattleshipSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+				
+				####################################
+				# Horizontal Carrier
+				####################################
+				if start[1] <= 5:
+					end = (x, y+4)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2CarrierSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+		
+				####################################
+				# Vertical Carrier
+				####################################
+				if start[0] <= 5:
+					end = (x + 4, y)
+					crds = self.getCrds(start,end)
+					good = True
+					for crd in crds:
+						if good == True and self.p2CarrierSunk == False and (shotMap[crd[0]][crd[1]] == "!" or shotMap[crd[0]][crd[1]] == " "):
+							pass
+						else:
+							good = False
+					if good:
+						for crd in crds:
+							heatMap[crd[0]][crd[1]] += 1
+		""" Old version where I was having a circling effect that was causing too long of games"""
+		for x in range(len(shotMap)):
+			for y in range(len(shotMap)):
+				if shotMap[x][y] != self.emptySpace and shotMap[x][y] == self.hitMark:
+					
+					crds = []
+					
+					# Cannot go down
+					if x > 8:
+						# Can go left right and up
+						left = (x, y - 1) 
+						right = (x, y + 1)
+						up = (x - 1, y)
+
+						crds.append(left)
+						crds.append(right)
+						crds.append(up)
+					else:
+						downCrd = (x + 1, y)
+						crds.append(downCrd)
+					
+					# Cannot go up
+					if x < 1:
+						# Can go left, right, down
+						left = (x, y - 1)
+						right = (x, y + 1)
+						down = (x + 1 , y)
+
+						crds.append(left)
+						crds.append(right)
+						crds.append(down)
+					else:
+						upCrd = (x - 1, y)
+						crds.append(upCrd)
+					
+					# Cannot go left
+					if y < 1:
+						# Can go right, up, down
+						right = (x, y + 1)
+						up = (x - 1, y)
+						down = (x + 1 , y)
+
+						crds.append(right)
+						crds.append(up)
+						crds.append(down)						
+						continue
+					else:
+						leftCrd = (x, y - 1)
+						crds.append(leftCrd)
+					
+					# Cannot go right
+					if y > 8:
+						# Can go left, up, down
+						left = (x, y - 1)
+						up = (x - 1, y)
+						down = (x + 1 , y)
+
+						crds.append(left)
+						crds.append(up)
+						crds.append(down)	
+					else:
+						rightCrd = (x, y + 1)
+						
+						crds.append(rightCrd)
+
+					for crd in crds:
+						if crd[0] >= 10 or crd[1] >= 10:
+							continue
+						if shotMap[crd[0]][crd[1]] == self.emptySpace:
+							heatMap[crd[0]][crd[1]] = heatMap[crd[0]][crd[1]] * 10
+
+		return heatMap
+		

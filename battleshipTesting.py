@@ -13,7 +13,7 @@ session.printShip("2")
 session.fire("1", (0,0))
 session.fire("1", (0,1))
 session.fire("1", (0,2))
-session.fire("1", (0,3))
+session.fire("1", (0,3)) 
 session.fire("1", (0,4))
 session.fire("1", (1,0))
 session.fire("1", (2,0))
@@ -37,7 +37,7 @@ print(session.checkWin("1"))
 #session.genRandomMap()
 #session.printShip("2")
 #session.randomShot(10000)
-session.heatMapMode(1)
+session.heatMapMode(100)
 
 """
 # Custom heatmap testing
