@@ -20,9 +20,13 @@ self.p1ShotMap: Player 1's shot map
 self.p2ShotMap: Player 2's shot map
 
 self.p1CarrierHealth = 5 	: Player 1 Carrier Health, initialized at 5 at beginning of game 
+
 self.p1BattleshipHealth = 4 : Player 1 Battleship Health, initialized at 4 at beginning of game 
+
 self.p1CruiserHealth = 3	: Player 1 Cruiser Health, initialized at 3 at beginning of game 
+
 self.p1SubmarineHealth = 3	: Player 1 Submarine Health, initialized at 3 at beginning of game 
+
 self.p1DestroyerHealth = 2	: Player 1 Destroyer Health, initialized at 2 at beginning of game 
 
 self.p2CarrierHealth = 5	: Player 2 Carrier Health, initialized at 5 at beginning of game 
