@@ -481,15 +481,16 @@ class game:
 
 		print(str(shots) + " total shots taken out of " + str(numPlays) + " games. Average shots per game " + str(shots/numPlays) + "\nBest game was " + str(best)) 
 
-	def heatMapMode(self, numPlays):
+	def heatMapMode(self, numPlays, printMaps=True):
 		shots = 0
 		best = 100
 		
 		#heatMap = self.heatMap(self.getShotMap(self.player1))
 
 		for x in range(numPlays):
-			print("Playing game " + str(x))
-			print("================================================================================================================")
+			if printMaps:
+				print("Playing game " + str(x))
+				print("================================================================================================================")
 			# Building the random map for this game
 			self.genRandomMap()
 
@@ -526,22 +527,24 @@ class game:
 						singleRow.insert(y+10, heatMap[x][y])
 					combinedMaps.append(singleRow)
 
-				# Printing both maps
-				for x in range(len(combinedMaps)):
-					for y in range(len(combinedMaps[x])):
-						if y < 10:
-							#print(x,y)
-							print("|" + str(combinedMaps[x][y]).center(3, " "), end = ' ')
-							
 
-							#print("|", end = ' ')
-						if y == 10:
-							print("|\t\t", end = ' ')
-						if y >= 10:
-							print("|" + str(combinedMaps[x][y]).center(3, " "), end = ' ')
-							#print("|", end = ' ')
-					print()
-				print("================================================================================================================")
+				if printMaps:
+					# Printing both maps
+					for x in range(len(combinedMaps)):
+						for y in range(len(combinedMaps[x])):
+							if y < 10:
+								#print(x,y)
+								print("|" + str(combinedMaps[x][y]).center(3, " "), end = ' ')
+								
+
+								#print("|", end = ' ')
+							if y == 10:
+								print("|\t\t", end = ' ')
+							if y >= 10:
+								print("|" + str(combinedMaps[x][y]).center(3, " "), end = ' ')
+								#print("|", end = ' ')
+						print()
+					print("================================================================================================================")
 				
 	
 
