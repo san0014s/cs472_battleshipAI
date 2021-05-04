@@ -1,5 +1,6 @@
 # cs472_battleshipAI
 Term Project for CS 472. Building an AI to play the board game Battleship
+Credit to: Steven Navarro, Garrett Owen, Nick Fryer, and Andrew Ferdenzi
 
 # Battleship game class information
 ## Ship Information
